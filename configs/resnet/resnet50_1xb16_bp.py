@@ -1,4 +1,4 @@
-_base_ = ['_base_/default_runtime.py']
+_base_ = ['../_base_/default_runtime.py']
 
 model = dict(type='BPResNet1D',
              data_preprocessor=dict(type='RppgDataPreprocessor'),

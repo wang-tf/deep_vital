@@ -4,3 +4,5 @@ Pytorch version of [non-invasive-bp-estimation-using-deep-learning](https://gith
 
 pretrained model can be found from [zendo](https://zenodo.org/record/7948098)
 
+## Models
+- [ResNet](configs/resnet/README.md)
