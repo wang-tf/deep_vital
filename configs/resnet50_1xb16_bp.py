@@ -8,7 +8,7 @@ model = dict(type='BPResNet1D',
                  frozen_stages=4,
                  init_cfg=dict(
                      type='Pretrained',
-                     checkpoint='data/resnet_ppg_nonmixed_backbone_v2.pb')),
+                     checkpoint='data/resnet_ppg_nonmixed_backbone.pth')),
              neck=dict(type='AveragePooling'),
              head=dict(type='BPDenseHead', loss=dict(type='MSELoss')))
 
