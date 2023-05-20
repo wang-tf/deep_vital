@@ -24,7 +24,7 @@ train_dataloader = dict(
     num_workers=2,
     dataset=dict(type=dataset_type,
                  ann_file='data/rPPG-BP-UKL_rppg_7s.h5',
-                 used_subjects=[7.,  8., 10., 13., 14., 19., 21., 23., 24., 27., 33., 35., 36., 44., 46., 48.],
+                 used_idx_file='data/train.txt',
                  data_prefix='',
                  test_mode=False,
                  pipeline=train_pipeline),
@@ -35,14 +35,24 @@ val_dataloader = dict(
     num_workers=2,
     dataset=dict(type=dataset_type,
                  ann_file='data/rPPG-BP-UKL_rppg_7s.h5',
-                 used_subjects=[6],
+                 used_idx_file='data/val.txt',
                  data_prefix='',
                  test_mode=True,
                  pipeline=test_pipeline),
     sampler=dict(type='DefaultSampler', shuffle=False),
 )
 val_evaluator = dict(type='MAE', gt_key='gt_label', pred_key='pred_label')
-test_dataloader = val_dataloader
+test_dataloader = dict(
+    batch_size=16,
+    num_workers=2,
+    dataset=dict(type=dataset_type,
+                 ann_file='data/rPPG-BP-UKL_rppg_7s.h5',
+                 used_idx_file='data/test.txt',
+                 data_prefix='',
+                 test_mode=True,
+                 pipeline=test_pipeline),
+    sampler=dict(type='DefaultSampler', shuffle=False),
+)
 test_evaluator = val_evaluator
 
 # optimizer

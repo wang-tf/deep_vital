@@ -20,7 +20,7 @@ def expanduser(path):
 class RppgData(BaseDataset):
     def __init__(self,
                  ann_file,
-                 used_subjects=(),
+                 used_idx_file=None,
                  metainfo=None,
                  data_root='',
                  data_prefix='',
@@ -34,7 +34,7 @@ class RppgData(BaseDataset):
         self.label = None
         self.rppg = None
         self.subject_idx = None
-        self.used_subjects=used_subjects
+        self.used_idx_file=used_idx_file
         self.num = None
 
         if isinstance(data_prefix, str):
@@ -70,14 +70,14 @@ class RppgData(BaseDataset):
         self.subject_idx = np.array(data.get('/subject_idx'), dtype=int)[0, :]
         subjects_list = np.unique(self.subject_idx)
 
-        if self.used_subjects:
-            idx_used = np.where(np.isin(self.subject_idx, self.used_subjects))[-1]
+        if self.used_idx_file and os.path.exists(self.used_idx_file):
+            idx_used = np.loadtext(self.used_idx_file, delimiter=',')
             self.label = self.label[idx_used]
             self.rppg = self.rppg[idx_used]
             self.subject_idx = self.subject_idx[idx_used]
-        
+
         self.num = self.subject_idx.shape[0]
-        
+
         data_list = []
         for _label, _rppg, _subject_idx in zip(self.label, self.rppg, self.subject_idx):
             # sbp_label = _label[0]
