@@ -58,7 +58,8 @@ class MAE(BaseMetric):
         for data_sample in data_samples:
             result = {
                 'pred_label': data_sample['pred_label'],
-                'gt_label': data_sample['gt_label']
+                'gt_label': data_sample['gt_label'],
+                'pred_loss': data_sample['pred_loss']
             }
             self.results.append(result)
 
@@ -66,6 +67,9 @@ class MAE(BaseMetric):
         metrics = {}
         target = torch.stack([res['gt_label'] for res in results])
         pred = torch.stack([res['pred_label'] for res in results])
+        loss = torch.stack([res['pred_loss'] for res in results])
+        val_loss = loss.mean()
+        metrics['val_loss'] = val_loss
 
         diff = abs(pred - target)
         sbp_mean = diff[:, 0].mean()

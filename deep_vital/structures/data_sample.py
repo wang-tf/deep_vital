@@ -48,3 +48,7 @@ class DataSample(BaseDataElement):
         """Set ``pred_label``."""
         self.set_field(format_label(value), 'pred_label', dtype=torch.Tensor)
         return self
+
+    def set_pred_loss(self, value: LABEL_TYPE) -> 'DataSample':
+        self.set_field(format_label(value), 'pred_loss', dtype=torch.Tensor)
+        return self
