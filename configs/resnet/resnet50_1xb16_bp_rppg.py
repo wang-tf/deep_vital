@@ -20,7 +20,7 @@ test_pipeline = [
     dict(type='PackInputs', input_key='rppg'),
 ]
 train_dataloader = dict(
-    batch_size=16,
+    batch_size=32,
     num_workers=2,
     dataset=dict(type=dataset_type,
                  ann_file='data/rPPG-BP-UKL_rppg_7s.h5',
@@ -75,3 +75,8 @@ visualizer = dict(
         dict(type='TensorboardVisBackend')
     ],
 )
+
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', interval=1, by_epoch=True, save_best='loss', rule='less'),
+)
+custom_hooks = [dict(type='EarlyStoppingHook', monitor='loss', rule='less', min_delta=0.01, strict=False, check_finite=True, patience=5)]
