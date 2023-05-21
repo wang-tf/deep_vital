@@ -67,7 +67,7 @@ class PpgData(BaseDataset):
 
         data = h5py.File(self.ann_file, 'r')
         self.label = np.array(data.get('/label'))
-        self.signal = np.array(data.get(f'/{self.signal_name}'))
+        self.signal = np.array(data.get(f'/{self._signal_name}'))
         self.subject_idx = np.array(data.get('/subject_idx'), dtype=int)
         subjects_list = np.unique(self.subject_idx)
 
