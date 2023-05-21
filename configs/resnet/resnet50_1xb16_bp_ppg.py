@@ -1,14 +1,11 @@
 _base_ = ['../_base_/default_runtime.py']
 
 model = dict(type='BPResNet1D',
-             data_preprocessor=dict(type='RppgDataPreprocessor'),
+             data_preprocessor=dict(type='DataPreprocessor'),
              backbone=dict(
                  type='ResNet1D',
                  depth=50,
-                 frozen_stages=4,
-                 init_cfg=dict(
-                     type='Pretrained',
-                     checkpoint='data/resnet_ppg_nonmixed_backbone.pth')),
+                 ),
              neck=dict(type='AveragePooling'),
              head=dict(type='BPDenseHead', loss=dict(type='MSELoss')))
 
@@ -23,8 +20,7 @@ train_dataloader = dict(
     batch_size=32,
     num_workers=2,
     dataset=dict(type=dataset_type,
-                 ann_file='data/MIMIC-III_ppg_dataset.h5',
-                 used_idx_file='data/train.txt',
+                 ann_file='data/mimic-iii_data/train.h5',
                  data_prefix='',
                  test_mode=False,
                  pipeline=train_pipeline),
@@ -34,8 +30,7 @@ val_dataloader = dict(
     batch_size=16,
     num_workers=2,
     dataset=dict(type=dataset_type,
-                 ann_file='data/MIMIC-III_ppg_dataset.h5',
-                 used_idx_file='data/val.txt',
+                 ann_file='data/mimic-iii_data/val.h5',
                  data_prefix='',
                  test_mode=True,
                  pipeline=test_pipeline),
@@ -46,8 +41,7 @@ test_dataloader = dict(
     batch_size=16,
     num_workers=2,
     dataset=dict(type=dataset_type,
-                 ann_file='data/MIMIC-III_ppg_dataset.h5',
-                 used_idx_file='data/test.txt',
+                 ann_file='data/mimic-iii_data/test.h5',
                  data_prefix='',
                  test_mode=True,
                  pipeline=test_pipeline),

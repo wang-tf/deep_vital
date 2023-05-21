@@ -9,7 +9,7 @@ from deep_vital.registry import MODELS
 
 
 @MODELS.register_module()
-class RppgDataPreprocessor(BaseDataPreprocessor):
+class DataPreprocessor(BaseDataPreprocessor):
     def __init__(self, pad_size_divisor=1, pad_value: Union[float, int] = 0, non_blocking: Optional[bool] = False):
         super().__init__(non_blocking)
         self.pad_size_divisor = pad_size_divisor
@@ -28,7 +28,7 @@ class RppgDataPreprocessor(BaseDataPreprocessor):
                                        self.pad_value)
         elif isinstance(_batch_inputs, torch.Tensor):
             assert _batch_inputs.dim() == 3, (
-                'The input of `RppgDataPreprocessor` should be a NCL tensor '
+                'The input of `DataPreprocessor` should be a NCL tensor '
                 'or a list of tensor, but got a tensor with shape: '
                 f'{_batch_inputs.shape}')
             _batch_inputs = _batch_inputs.float()

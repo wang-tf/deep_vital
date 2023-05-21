@@ -1,7 +1,7 @@
 _base_ = ['../_base_/default_runtime.py']
 
 model = dict(type='BPResNet1D',
-             data_preprocessor=dict(type='RppgDataPreprocessor'),
+             data_preprocessor=dict(type='DataPreprocessor'),
              backbone=dict(
                  type='ResNet1D',
                  depth=50,
