@@ -39,10 +39,10 @@ class BPResNet1D(BaseModel):
         results_list = self.head.predict(feats,
                                          batch_data_samples,
                                          rescale=rescale)
-        val_loss = self.head.loss(feats, batch_data_samples)
+        # val_loss = self.head.loss(feats, batch_data_samples)
         results_list = torch.cat([results_list[0], results_list[1]], dim=1)
         batch_data_samples = self.add_pred_to_datasample(
-            batch_data_samples, results_list, val_loss)
+            batch_data_samples, results_list)
         return batch_data_samples
 
     def _forward(self, batch_inputs, batch_data_samples=None):
@@ -109,6 +109,6 @@ class BPResNet1D(BaseModel):
         for data_sample, pred_label in zip(data_samples, results_list):
             data_sample.pred_label = pred_label
         if loss_list is not None:
-            for data_sample, pred_loss in zip(data_sample, loss_list):
-                data_sample.pred_loss = pred_loss
+            for data_sample, pred_loss in zip(data_samples, loss_list):
+                data_sample.pred_loss = pred_loss['loss']
         return data_samples

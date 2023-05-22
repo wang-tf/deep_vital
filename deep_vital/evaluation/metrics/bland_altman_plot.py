@@ -41,6 +41,7 @@ def bland_altman_plot(data1, data2, *args, **kwargs):
 @METRICS.register_module()
 class BlandAltmanPlot(BaseMetric):
     metric = 'BlandAltmanPlot'
+    default_prefix = 'BlandAltmanPlot'
 
     def __init__(self,
                  gt_key='gt_label',

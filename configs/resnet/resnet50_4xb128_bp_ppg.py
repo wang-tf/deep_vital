@@ -18,7 +18,7 @@ test_pipeline = [
 ]
 train_dataloader = dict(
     batch_size=128,
-    num_workers=4,
+    num_workers=2,
     dataset=dict(type=dataset_type,
                  ann_file='data/mimic-iii_data/train.h5',
                  data_prefix='',
@@ -28,7 +28,7 @@ train_dataloader = dict(
 )
 val_dataloader = dict(
     batch_size=64,
-    num_workers=4,
+    num_workers=2,
     dataset=dict(type=dataset_type,
                  ann_file='data/mimic-iii_data/val.h5',
                  data_prefix='',
@@ -39,11 +39,11 @@ val_dataloader = dict(
 val_evaluator = [
     dict(type='MAE', gt_key='gt_label',
          pred_key='pred_label', loss_key='pred_loss'),
-    dict(type='BlandAltmanPlot')
+    # dict(type='BlandAltmanPlot')
 ]
 test_dataloader = dict(
     batch_size=64,
-    num_workers=4,
+    num_workers=2,
     dataset=dict(type=dataset_type,
                  ann_file='data/mimic-iii_data/test.h5',
                  data_prefix='',
