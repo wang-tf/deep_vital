@@ -42,9 +42,10 @@ class MAE(BaseMetric):
             # loss = torch.stack([res['pred_loss'] for res in results])
             # val_loss = loss.mean()
             # metrics['pred_loss'] = val_loss
-            sbp_pred, dbp_pred = pred
-            sbp_target = target[:, 0][..., None]
-            dbp_target = target[:, 1][..., None]
+            sbp_pred = pred[:, 0]
+            dbp_pred = pred[:, 1]
+            sbp_target = target[:, 0]
+            dbp_target = target[:, 1]
             sbp_mse_loss = F.mse_loss(sbp_pred, sbp_target.detach())
             dbp_mse_loss = F.mse_loss(dbp_pred, dbp_target.detach())
             metrics['pred_loss'] = sbp_mse_loss + dbp_mse_loss

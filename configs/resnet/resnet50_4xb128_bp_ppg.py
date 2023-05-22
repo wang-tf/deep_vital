@@ -76,9 +76,9 @@ visualizer = dict(
 
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', interval=1,
-                    by_epoch=True, save_best='pred_loss', rule='less'),
+                    by_epoch=True, save_best='MAE/pred_loss', rule='less'),
 )
 custom_hooks = [
-    dict(type='EarlyStoppingHook', monitor='pred_loss', rule='less',
+    dict(type='EarlyStoppingHook', monitor='MAE/pred_loss', rule='less',
          min_delta=0.01, strict=False, check_finite=True, patience=5)
 ]

@@ -7,8 +7,7 @@ from deep_vital.structures import DataSample
 
 
 @MODELS.register_module()
-class BPResNet1D(BaseModel):
-
+class BPLSTM(BaseModel):
     def __init__(self,
                  backbone,
                  neck=None,
