@@ -5,7 +5,7 @@ model = dict(type='BPResNet1D',
              backbone=dict(
                  type='ResNet1D',
                  depth=50,
-                 ),
+             ),
              neck=dict(type='AveragePooling'),
              head=dict(type='BPDenseHead', loss=dict(type='MSELoss')))
 
@@ -17,8 +17,8 @@ test_pipeline = [
     dict(type='PackInputs', input_key='ppg'),
 ]
 train_dataloader = dict(
-    batch_size=32,
-    num_workers=2,
+    batch_size=128,
+    num_workers=4,
     dataset=dict(type=dataset_type,
                  ann_file='data/mimic-iii_data/train.h5',
                  data_prefix='',
@@ -27,8 +27,8 @@ train_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=True),
 )
 val_dataloader = dict(
-    batch_size=16,
-    num_workers=2,
+    batch_size=64,
+    num_workers=4,
     dataset=dict(type=dataset_type,
                  ann_file='data/mimic-iii_data/val.h5',
                  data_prefix='',
@@ -36,10 +36,14 @@ val_dataloader = dict(
                  pipeline=test_pipeline),
     sampler=dict(type='DefaultSampler', shuffle=False),
 )
-val_evaluator = dict(type='MAE', gt_key='gt_label', pred_key='pred_label')
+val_evaluator = [
+    dict(type='MAE', gt_key='gt_label',
+         pred_key='pred_label', loss_key='pred_loss'),
+    dict(type='BlandAltmanPlot')
+]
 test_dataloader = dict(
-    batch_size=16,
-    num_workers=2,
+    batch_size=64,
+    num_workers=4,
     dataset=dict(type=dataset_type,
                  ann_file='data/mimic-iii_data/test.h5',
                  data_prefix='',
@@ -71,6 +75,10 @@ visualizer = dict(
 )
 
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', interval=1, by_epoch=True, save_best='loss', rule='less'),
+    checkpoint=dict(type='CheckpointHook', interval=1,
+                    by_epoch=True, save_best='pred_loss', rule='less'),
 )
-custom_hooks = [dict(type='EarlyStoppingHook', monitor='loss', rule='less', min_delta=0.01, strict=False, check_finite=True, patience=5)]
+custom_hooks = [
+    dict(type='EarlyStoppingHook', monitor='pred_loss', rule='less',
+         min_delta=0.01, strict=False, check_finite=True, patience=5)
+]
