@@ -5,9 +5,9 @@
 ## Abstract
 
 ## Results and Models
-| Model | MAE-SBP | MAE-DBP |
-| :---: | :-----: | :-----: |
-| ResNet501D | - | - |
+| Method | MAE-SBP | MAE-DBP | Config |
+| :----: | :-----: | :-----: | :----: |
+| ResNet501D | 16.51 | 8.81 | [config](./resnet50_4xb128_bp_ppg.py) |
 
 
 ## Citation
