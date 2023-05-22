@@ -44,5 +44,5 @@ class MSELoss(BaseModule):
         # TODO: set float32 in dataset loader
         target = target.to(torch.float32)
         # loss_align = self.loss_mse(pred, target.detach())
-        mse_loss = F.mse_loss(pred, target)
+        mse_loss = F.mse_loss(pred, target.detach())
         return mse_loss

@@ -1,49 +1,60 @@
-_base_ = ['_base_/default_runtime.py']
+_base_ = ['../_base_/default_runtime.py']
 
 model = dict(type='BPResNet1D',
-             data_preprocessor=dict(type='RppgDataPreprocessor'),
+             data_preprocessor=dict(type='DataPreprocessor'),
              backbone=dict(
                  type='ResNet1D',
                  depth=50,
-                 frozen_stages=4,
-                 init_cfg=dict(
-                     type='Pretrained',
-                     checkpoint='data/resnet_ppg_nonmixed_backbone_v2.pb')),
+             ),
              neck=dict(type='AveragePooling'),
              head=dict(type='BPDenseHead', loss=dict(type='MSELoss')))
 
-dataset_type = 'RppgData'
+dataset_type = 'PpgData'
 train_pipeline = [
-    dict(type='PackInputs', input_key='rppg'),
+    dict(type='PackInputs', input_key='ppg'),
 ]
 test_pipeline = [
-    dict(type='PackInputs', input_key='rppg'),
+    dict(type='PackInputs', input_key='ppg'),
 ]
 train_dataloader = dict(
-    batch_size=16,
+    batch_size=128,
     num_workers=2,
     dataset=dict(type=dataset_type,
-                 ann_file='data/rPPG-BP-UKL_rppg_7s.h5',
-                 used_subjects=[7.,  8., 10., 13., 14., 19., 21., 23., 24., 27., 33., 35., 36., 44., 46., 48.],
+                 ann_file='data/mimic-iii_data/train.h5',
                  data_prefix='',
                  test_mode=False,
                  pipeline=train_pipeline),
     sampler=dict(type='DefaultSampler', shuffle=True),
 )
 val_dataloader = dict(
-    batch_size=16,
+    batch_size=64,
     num_workers=2,
     dataset=dict(type=dataset_type,
-                 ann_file='data/rPPG-BP-UKL_rppg_7s.h5',
-                 used_subjects=[6],
+                 ann_file='data/mimic-iii_data/val.h5',
                  data_prefix='',
                  test_mode=True,
                  pipeline=test_pipeline),
     sampler=dict(type='DefaultSampler', shuffle=False),
 )
-val_evaluator = dict(type='MAE', gt_key='gt_label', pred_key='pred_label')
-test_dataloader = val_dataloader
-test_evaluator = val_evaluator
+val_evaluator = [
+    dict(type='MAE', gt_key='gt_label',
+         pred_key='pred_label', compute_loss=True),
+    # dict(type='BlandAltmanPlot')
+]
+test_dataloader = dict(
+    batch_size=64,
+    num_workers=2,
+    dataset=dict(type=dataset_type,
+                 ann_file='data/mimic-iii_data/test.h5',
+                 data_prefix='',
+                 test_mode=True,
+                 pipeline=test_pipeline),
+    sampler=dict(type='DefaultSampler', shuffle=False),
+)
+test_evaluator = [
+    dict(type='MAE', gt_key='gt_label',
+         pred_key='pred_label')
+]
 
 # optimizer
 optim_wrapper = dict(optimizer=dict(type='Adam',
@@ -65,3 +76,12 @@ visualizer = dict(
         dict(type='TensorboardVisBackend')
     ],
 )
+
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', interval=1,
+                    by_epoch=True, save_best='MAE/pred_loss', rule='less'),
+)
+custom_hooks = [
+    dict(type='EarlyStoppingHook', monitor='MAE/pred_loss', rule='less',
+         min_delta=0.01, strict=False, check_finite=True, patience=5)
+]

@@ -1,5 +1,4 @@
 from typing import List
-from abc import ABCMeta, abstractmethod
 import torch
 from torch import nn
 from mmengine.model import BaseModel
@@ -34,11 +33,12 @@ class BPResNet1D(BaseModel):
         return hasattr(self, 'neck') and self.neck is not None
 
     def predict(self, batch_inputs, batch_data_samples, rescale: bool = True):
-        x = self.extract_feat(batch_inputs)
+        feats = self.extract_feat(batch_inputs)
 
-        results_list = self.head.predict(x,
+        results_list = self.head.predict(feats,
                                          batch_data_samples,
                                          rescale=rescale)
+        # val_loss = self.head.loss(feats, batch_data_samples)
         results_list = torch.cat([results_list[0], results_list[1]], dim=1)
         batch_data_samples = self.add_pred_to_datasample(
             batch_data_samples, results_list)
@@ -80,9 +80,10 @@ class BPResNet1D(BaseModel):
             dict[str, Tensor]: a dictionary of loss components
         """
         feats = self.extract_feat(inputs)
+        
         return self.head.loss(feats, data_samples)
 
-    def add_pred_to_datasample(self, data_samples, results_list):
+    def add_pred_to_datasample(self, data_samples, results_list, loss_list=None):
         """Add predictions to `DetDataSample`.
 
         Args:
@@ -106,4 +107,7 @@ class BPResNet1D(BaseModel):
         """
         for data_sample, pred_label in zip(data_samples, results_list):
             data_sample.pred_label = pred_label
+        if loss_list is not None:
+            for data_sample, pred_loss in zip(data_samples, loss_list):
+                data_sample.pred_loss = pred_loss['loss']
         return data_samples

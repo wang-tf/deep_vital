@@ -1,1 +1,1 @@
-from .data_processor import RppgDataPreprocessor
+from .data_processor import DataPreprocessor

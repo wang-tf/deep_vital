@@ -1,4 +1,4 @@
-from .bp_resnet import BPResNet1D
+from .blood_pressure import *
 from .backbones import *
 from .necks import *
 from .heads import *

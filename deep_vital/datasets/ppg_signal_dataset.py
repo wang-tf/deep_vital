@@ -17,10 +17,11 @@ def expanduser(path):
 
 
 @DATASETS.register_module()
-class RppgData(BaseDataset):
+class PpgData(BaseDataset):
+    _signal_name = 'ppg'
     def __init__(self,
                  ann_file,
-                 used_subjects=(),
+                 used_idx_file=None,
                  metainfo=None,
                  data_root='',
                  data_prefix='',
@@ -32,9 +33,9 @@ class RppgData(BaseDataset):
                  lazy_init=False,
                  max_refetch=1000):
         self.label = None
-        self.rppg = None
+        self.signal = None
         self.subject_idx = None
-        self.used_subjects=used_subjects
+        self.used_idx_file=used_idx_file
         self.num = None
 
         if isinstance(data_prefix, str):
@@ -65,24 +66,24 @@ class RppgData(BaseDataset):
         assert os.path.exists(self.ann_file), self.ann_file
 
         data = h5py.File(self.ann_file, 'r')
-        self.label = np.array(data.get('/label')).T
-        self.rppg = np.array(data.get('/rppg')).T
-        self.subject_idx = np.array(data.get('/subject_idx'), dtype=int)[0, :]
+        self.label = np.array(data.get('/label'))
+        self.signal = np.array(data.get(f'/{self._signal_name}'))
+        self.subject_idx = np.array(data.get('/subject_idx'), dtype=int)
         subjects_list = np.unique(self.subject_idx)
 
-        if self.used_subjects:
-            idx_used = np.where(np.isin(self.subject_idx, self.used_subjects))[-1]
+        if self.used_idx_file and os.path.exists(self.used_idx_file):
+            idx_used = np.loadtxt(self.used_idx_file, dtype=np.int64, delimiter=',')
             self.label = self.label[idx_used]
-            self.rppg = self.rppg[idx_used]
+            self.signal = self.signal[idx_used]
             self.subject_idx = self.subject_idx[idx_used]
-        
+
         self.num = self.subject_idx.shape[0]
-        
+
         data_list = []
-        for _label, _rppg, _subject_idx in zip(self.label, self.rppg, self.subject_idx):
+        for _label, _signal, _subject_idx in zip(self.label, self.signal, self.subject_idx):
             # sbp_label = _label[0]
             # dbp_label = _label[1]
             # _label = _label.reshape((1, 2, 1))
-            info = {'gt_label': _label, 'rppg': _rppg, 'subject_idx': _subject_idx}
+            info = {'gt_label': _label, f'{self._signal_name}': _signal, 'subject_idx': _subject_idx}
             data_list.append(info)
         return data_list
