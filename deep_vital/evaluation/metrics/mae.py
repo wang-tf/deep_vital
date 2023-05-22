@@ -2,10 +2,7 @@ from typing import Optional
 import torch
 import torch.nn.functional as F
 from mmengine.evaluator import BaseMetric
-from mmengine import MessageHub
 from deep_vital.registry import METRICS
-
-message_hub = MessageHub.get_current_instance()
 
 
 @METRICS.register_module()
@@ -16,13 +13,13 @@ class MAE(BaseMetric):
     def __init__(self,
                  gt_key='gt_label',
                  pred_key='pred_label',
-                 loss_key=None,
+                 compute_loss=False,
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None):
         super().__init__(collect_device=collect_device, prefix=prefix)
         self.gt_key = gt_key
         self.pred_key = pred_key
-        self.loss_key = loss_key
+        self.compute_loss = compute_loss
 
     def process(self, data_batch, data_samples):
         for data_sample in data_samples:
@@ -30,18 +27,13 @@ class MAE(BaseMetric):
                 'pred_label': data_sample[self.pred_key],
                 'gt_label': data_sample[self.gt_key]
             }
-            # if self.loss_key:
-            #     result['pred_loss'] = data_sample[self.loss_key]
             self.results.append(result)
 
     def compute_metrics(self, results):
         metrics = {}
         target = torch.stack([res['gt_label'] for res in results])
         pred = torch.stack([res['pred_label'] for res in results])
-        if self.loss_key:
-            # loss = torch.stack([res['pred_loss'] for res in results])
-            # val_loss = loss.mean()
-            # metrics['pred_loss'] = val_loss
+        if self.compute_loss:
             sbp_pred = pred[:, 0]
             dbp_pred = pred[:, 1]
             sbp_target = target[:, 0]

@@ -38,7 +38,7 @@ val_dataloader = dict(
 )
 val_evaluator = [
     dict(type='MAE', gt_key='gt_label',
-         pred_key='pred_label', loss_key='pred_loss'),
+         pred_key='pred_label', compute_loss=True),
     # dict(type='BlandAltmanPlot')
 ]
 test_dataloader = dict(
@@ -51,7 +51,10 @@ test_dataloader = dict(
                  pipeline=test_pipeline),
     sampler=dict(type='DefaultSampler', shuffle=False),
 )
-test_evaluator = val_evaluator
+test_evaluator = [
+    dict(type='MAE', gt_key='gt_label',
+         pred_key='pred_label')
+]
 
 # optimizer
 optim_wrapper = dict(optimizer=dict(type='Adam',
